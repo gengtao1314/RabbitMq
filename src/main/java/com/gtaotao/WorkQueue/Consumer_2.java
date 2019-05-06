@@ -1,4 +1,5 @@
 package com.gtaotao.WorkQueue;
+import com.gtaotao.Util.ConnectionUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.QueueingConsumer;

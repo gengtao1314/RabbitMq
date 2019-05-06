@@ -1,4 +1,4 @@
-package com.gtaotao.WorkQueue;
+package com.gtaotao.Util;
 
 /**
  * Created by gengtao on 2019/5/5.

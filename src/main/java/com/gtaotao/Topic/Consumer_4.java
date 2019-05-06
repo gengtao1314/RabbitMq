@@ -1,15 +1,18 @@
-package com.gtaotao.WorkQueue;
+package com.gtaotao.Topic;
 
-/**
- * Created by gengtao on 2019/5/5.
- * work模式有两种模式，一种是轮询模式，一种是公平分发模式，即能者多得
- */
 import com.gtaotao.Util.ConnectionUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.QueueingConsumer;
-public class Consumer_1 {
-    private final static String QUEUE_NAME = "q_test_01";
+
+/**
+ * Created by gengtao on 2019/5/6.
+ * 与Consumer_1相同queue，测试是否同一时间只有1和4只有一个能获取消息
+ */
+public class Consumer_4 {
+    private final static String QUEUE_NAME = "test_queue_topic1";
+
+    private final static String EXCHANGE_NAME = "test_exchange_topic";
 
     public static void main(String[] argv) throws Exception {
 
@@ -20,22 +23,24 @@ public class Consumer_1 {
         // 声明队列
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
-        // 同一时刻服务器只会发一条消息给消费者，使用能者多得模式时，要设置该代码，轮询模式时不需要设置
+        // 绑定队列到交换机
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "update.#");
+
+        // 同一时刻服务器只会发一条消息给消费者
         channel.basicQos(1);
 
         // 定义队列的消费者
         QueueingConsumer consumer = new QueueingConsumer(channel);
-        // 监听队列，false表示手动返回完成状态，true表示自动
+        // 监听队列，手动返回完成
         channel.basicConsume(QUEUE_NAME, false, consumer);
 
         // 获取消息
         while (true) {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             String message = new String(delivery.getBody());
-            System.out.println(" [y] Received '" + message + "'");
-            //休眠
-            Thread.sleep(10);
-            // 返回确认状态，默认使用自动确认模式，false表示使用手动确认模式，使用能者多得模式时要手动确认
+            System.out.println("Consumer4 [Recv] Received '" + message + "'");
+            Thread.sleep(2000);
+
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
         }
     }
